@@ -557,7 +557,7 @@ $("#NewQuestionAddButton").click(function(){
 
     //	$("#NewQuestion").val()
     //  $("#NewAnswer").val()
-	var Command = "insert,'"+$("#NewQuestion").val()+"','"+$("#NewAnswer").val()+"'";
+	var Command = "insert,"+$("#NewQuestion").val()+","+$("#NewAnswer").val()";
 	
 	$.ajax({
 		"type":"post",
