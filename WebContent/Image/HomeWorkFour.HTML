@@ -1,0 +1,247 @@
+<!doctype html>
+
+<html>
+	
+	<head>
+		<title>title</title>
+		<meta charset ="UTF-8"/>
+		<style>		
+			@import url('MyLabCss.css');
+
+		    #Inarticle{/*font-size:150%;*/
+						
+					    margin:25px 100px;}
+            fieldset{width: 1000px; height:600px; margin: 0px ;border: 5px solid #66B3FF ;border-radius: 20px;}
+
+		    #img { margin:0px 180px;
+                   /*float:inherit;*/
+		    }
+
+
+
+		    #change {/*float:inherit;*/
+                     border: 1px solid;
+                     width:600px;
+                     height:140px;
+                     margin:10px 0px 10px 180px;
+		    }
+
+		    #number {  margin-left:65px;
+                       margin-bottom: 0px;
+                      border: 1px solid red;
+		    }
+
+		      
+
+		    img {/*float:inherit;*/
+                         /*padding:0px auto;*/
+                     margin-right:20px;
+                     margin-bottom: 0px;
+                      margin-top: 0px;
+
+		    }
+		    #Player { 
+                         border: 1px solid red;
+                         margin-left:190px;
+                       width:250px;
+                       height:50px;
+                       margin-top:20px;
+
+		    }
+
+		</style>
+		<script>
+			
+		   // document.getElementById("CG2").src = "Image/M" + count + ".jpg";
+		    window.onload = function () {
+		        
+		        count = 0;
+		        one = 1;
+
+		        document.getElementById("UP").src = "Image/P3.jpg";
+		        document.getElementById("STOPandPlay").src = "Image/P5.jpg";
+		        document.getElementById("DOWN").src = "Image/P1.jpg";
+
+		        document.getElementById("STOPandPlay").onclick = Stop;
+
+		        document.getElementById("UP").onclick = Before;
+		        document.getElementById("DOWN").onclick = After;
+
+
+		        document.getElementById("MainCg").src = "Image/C" + 0 + ".jpg";
+		        document.getElementById("CG0").src = "Image/M0.jpg";
+		        document.getElementById("CG1").src = "Image/M0.jpg";
+		        document.getElementById("CG2").src = "Image/M0.jpg";
+		        document.getElementById("CG3").src = "Image/M0.jpg";
+		        document.getElementById("CG4").src = "Image/M0.jpg";
+		        document.getElementById("CG5").src = "Image/M0.jpg";
+		        document.getElementById("CG6").src = "Image/M0.jpg";
+
+
+
+
+
+
+
+		        window.setInterval(function () {
+		            count = count + one;
+		            if (count > 6) { count = 0;}
+		        document.getElementById("MainCg").src = "Image/C" + count + ".jpg";
+		        document.getElementById("CG0").src = "Image/M0.jpg";
+		        document.getElementById("CG1").src = "Image/M0.jpg";
+		        document.getElementById("CG2").src = "Image/M0.jpg";
+		        document.getElementById("CG3").src = "Image/M0.jpg";
+		        document.getElementById("CG4").src = "Image/M0.jpg";
+		        document.getElementById("CG5").src = "Image/M0.jpg";
+		        document.getElementById("CG6").src = "Image/M0.jpg";
+		        
+
+		        document.getElementById("CG"+count+"").src = "Image/M1.jpg";
+
+		      }, 3000);
+		        
+		        function Stop() { one = 0; document.getElementById("STOPandPlay").onclick = Go; }
+		        function Go() { one = 1; document.getElementById("STOPandPlay").onclick = Stop; }
+		        function After() { one = 0; count = count + 1; if (count > 6) { count = 0; one = 1; } }
+		        function Before() { one = 0; count = count - 1; if (count < 0) { count = 6; one = 1; } }
+		       
+
+		        		    }
+		</script>
+	</head>
+	
+<!--	 document.getElementById("MainCg").src = "Image/C" + count + ".jpg";
+		            document.getElementById("CG1").src = "Image/M0.jpg";
+		            document.getElementById("CG2").src = "Image/M0.jpg";
+		            document.getElementById("CG3").src = "Image/M0.jpg";
+		            document.getElementById("CG4").src = "Image/M0.jpg";
+		            document.getElementById("CG5").src = "Image/M0.jpg";
+		            document.getElementById("CG6").src = "Image/M0.jpg";
+		            document.getElementById("CG7").src = "Image/M0.jpg";
+		            document.getElementById("UP").src = "Image/P3.jpg";
+		            document.getElementById("DOWN").src = "Image/P5.jpg";
+		            document.getElementById("STOP").src = "Image/P1.jpg";-->
+
+	
+	
+	
+	<body>
+		<div id="AllDiv">
+		
+		<div id="TopDiv">
+			
+			<!--<nav>-->
+			<ul id="Menu">
+				<li><a href="LabHomePage.HTML">回首頁</a></li>
+				<li><a href="HomeWorkOne.HTML">作業一</a></li>
+				<li><a href="HomeWorkTwo.HTML">作業二</a></li>
+				<li><a href="HomeWorkThree.HTML">作業三</a></li>
+				<li><a href="HomeWorkFour.HTML">作業四</a></li>
+				<li><a href="HomeWorkFive.HTML">作業五</a></li>
+				<li><a href="God.HTML">聯絡上帝</a></li>
+			</ul>
+			<!--</nav>-->
+		</div><!--TOP-->
+		
+		
+		<div id="ContentDiv">
+			<div id="article">
+			
+
+
+
+
+
+
+                <div id="Inarticle">
+
+                <form action="#"method="get">
+					
+						<fieldset>
+							<legend style="font-size: 2em; margin:20px;margin-bottom:3px;">Form Check</legend>
+								
+
+
+
+					            <div id="img">
+
+                                        <img id="MainCg" src= />  
+                                
+                                </div>
+
+
+
+					            <div id="change">
+                                    <div id="number">
+                                        <!--<figure>-->
+                                          <img src="" id="CG0" />
+                                          <img src="" id="CG1" />
+                                          <img src="" id="CG2" />
+                                          <img src="" id="CG3" />
+                                          <img src="" id="CG4" />
+                                          <img src="" id="CG5" />
+                                          <img src="" id="CG6" />
+                                       <!-- </figure>-->
+
+
+                                        
+                                     </div>
+                                    <div id ="Player">
+                                          <img src="" id="UP" />
+                                          <img src="" id="STOPandPlay" />
+                                          <img src="" id="DOWN" />
+                                        
+                                        </div>
+                                </div>
+					
+						</fieldset>
+				
+					</form>
+			
+                </div>
+			</div>
+			
+			
+			
+			<div id="RightDiv">
+			<h2>最新消息！！</h2>
+			
+			<h3 style="text-align:center">＜新增了作業1、2＞</h3>
+			
+			<p>作業增加拉，快組隊打一波阿！</p>
+			
+			<h3 style="text-align:center">＜提早下課啦!!＞</h3>
+				
+			<p>總而言之每周禮拜五提早下課！五點準時下課！</p>
+			
+			<h4 style="text-align:center">＜Faker考過JAVA證照！＞</h4>
+				
+			<p>受大家矚目的Faker在本周考過了JAVA專業版證照，太神啦！</p>
+			
+			
+			<h4 style="text-align:center">＜我他媽不知道要打什麼啦！＞</h4>
+				
+			<p>青菜啦，哈哈哈哈哈哈哈哈哈哈哈哈哈(崩潰)！</p>
+			
+			
+			</div><!--RightDiv-->
+		</div> <!--content-->
+		
+		
+		
+		
+		
+		<div id="DownDiv">
+			
+			
+			<marquee style="overflow:hidden;">
+				<img src="Image/A3.jpg">
+			</marquee>
+			
+		</div>
+		
+		
+		</div><!--ALL-->
+	</body>
+	
+</html>

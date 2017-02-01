@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset ="UTF-8"/>
+<title>Hangman</title>
+<style>@import url('MyLabCss.css');
+		#ContentDiv{width: 80%;
+ 					margin-left: 90px;}
+ 		#Enter{display:none;}
+ 		#QuestionAnswerArea{
+ 		position:absolute;
+		left:45%;
+		top:20%;}
+ 		#GameArea{display:none;}
+ 		#canvas{top:20%;}
+ 		#GG{display:none;}
+ 		#PassPage{display:none;}
+</style>
+
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+</head>
+<body>
+
+<div id="AllDiv">
+	<div id = "import"></div>
+
+	<div id="ContentDiv">
+	
+<!-- 	Step1 先做題目擴充 -->
+		<div id="Qcheck"><h3>始まる前に、一つの協力をいただけませんでしょうか？
+		</br>下記の英語とその意味は合っているでしょうか？</h3>
+			<label id = "Qusetion">Qusetion</label>　　
+			<label id = "Answer" >Answer</label>
+			<input type="hidden" id = "QuestionNumber" value="0">
+			<input type="hidden" id = "Correct" value="0">
+			<input type="hidden" id = "Wrong" value="0">
+			
+			<br><br>
+			<input id="YesButton" type="button" value="Y e s"><label>　 　</label>     
+			<input id="NoButton" type="button" value="N o">
+		</div>
+		
+<!-- 	Step2 準備進入遊戲  Step1完畢之前先隱藏	-->
+		<div id="Enter"><h3>ご協力ありがとうございます。
+		</br>もしうまくゲームをクリアしましたら、あなたにも一つの問題をデーターベースに入力できますよ！
+		</br>ではEnterを押して、ゲームをスタートにしてください！	</h3></div>
+		
+<!-- 	Step3開始猜字		 -->
+		<div id = "GameArea">
+		<h1>　</h1>	<br><br>
+			<canvas id="canvas" width="450" height="450">瀏覽器不支援畫布</canvas>
+			
+			<div id = QuestionAnswerArea>
+				<br><h2>問題は<label id="QuestionAmount"></label>文字です：  　　　<label id ="QuestionView" > ___　___　___　___ </label></h2>
+				
+				<br><br><h2>確定後ENTERを押してください：<label id = "AnswerInput"><u>請輸入</u></label></h2>
+				
+				<br><h2>正しい：<lable id ="CorrectView"></lable></h2>
+				<br><h2>間違い：<lable id ="MistakeView"></lable></h2>
+			</div>
+		</div>
+
+
+		<!-- GameoverArea -->
+		<div Id = "GG"> <h1>Gameover, F5 ボタンをクリックしてリスタートください</h1><h1 id = "ggAnswer"></h1></div>
+		
+		<!-- 過關Area -->
+		<div id = "PassPage">
+		
+			ゲームクリアおめでとうご ざいます！一つの問題を入力してみませんか？<br>
+			英語：<input type="text" id = "NewQuestion"><br>
+			意味：<input type="text" id = "NewAnswer"><br>
+			<input type="submit" id = "NewQuestionAddButton" value ="確定">
+				
+		</div>
+	</div>
+</div>
+
+<!-- js -->
+<script type="text/javascript">
+//1.取隨尚未通過測試機單字
+$.ajax({
+	"type":"post",
+	"url":"Hangman/QusetionServlet.do",
+	"data":{"action":"QuestionCheck"},
+	"dataType":"json",
+	"success":function(data){
+	
+		$.each(data,function(){
+		   $("#QuestionNumber").val(this.QuestionNumber);
+		   $("#Qusetion").html(this.Question);
+		   $("#Answer").html(this.Answer);
+		   $("#Correct").val(this.Correct);
+		   $("#Wrong").val(this.Wrong);
+		   
+		});
+	}
+	
+});
+
+//2.YesBottonClick
+$("#YesButton").click(function(){
+	
+	$("#Qcheck").css("display","none");
+	$("#Enter").css("display",'inline');	
+
+ var Correct = $("#Correct").val();
+     Correct++;
+ //alert(QuestionNumber);
+
+var Command = "update QuestionVO set correct = '" + Correct + 
+			  "' where questionNumber ='" + $("#QuestionNumber").val() + "'";
+		
+	$.ajax({
+		"type":"post",
+		"url":"Hangman/QusetionServlet.do",
+		"data":{"action":"SelectCommand", 
+			    "Command":Command},
+		"dataType":"json",
+		"success":function(data){
+			$.each(data,function(){});
+		}
+		
+	});
+	
+});
+
+//3.NoBottonClick
+$("#NoButton").click(function(){
+	
+	$("#Qcheck").css("display","none");
+	$("#Enter").css("display",'inline');
+	
+	var Wrong = $("#Wrong").val();
+    	Wrong++;
+
+	var Command = "update QuestionVO set wrong = '" + Wrong + 
+			      "' where questionNumber ='" + $("#QuestionNumber").val() + "'";
+     	
+	$.ajax({
+		"type":"post",
+		"url":"Hangman/QusetionServlet.do",
+		"data":{"action":"SelectCommand", 
+			    "Command":Command},
+		"dataType":"json",
+		"success":function(data){
+			$.each(data,function(){});
+		}
+	
+	});
+	
+	
+});
+
+
+//4.畫布相關設定  //正方形
+    var grid = 450;
+	var width = 450;
+	var height = 450;
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	
+	//原點 > (width/10)*3, (height/10)*1
+	ctx.fillRect((grid/10)*3, (grid/10)*0, (grid/10)*4, (grid/1000)*3); 
+	ctx.fillRect((grid/10)*3, (grid/10)*0, (grid/1000)*3, (grid/10)*1);
+	ctx.fillRect((grid/10)*7, (grid/10)*0, (grid/1000)*3, (grid/10)*10); 
+	ctx.fillRect((grid/10)*0, (grid/10)*9, (grid/10)*10, (grid/10)*10); 
+
+//5.題目相關
+	//題目解答設置
+	var question = "java";
+	var answer = "";
+	$.ajax({
+		"type":"post",
+		"url":"Hangman/QusetionServlet.do",
+		"data":{"action":"getCorrectQuestion"},
+		"dataType":"json",
+		"success":function(data){
+		
+			$.each(data,function(){
+			   
+				question = this.Question;
+				answer = this.Answer;
+			   //延遲問題，移上來了
+			   Qusetion(question);
+			});
+		}
+		
+	});
+	
+	
+	
+	
+	//設置完畢，以下繼續
+	var questionView = "";
+	function Qusetion(question){
+		
+		//1.題目共有__個字
+		$("#QuestionAmount").html("<u>"+question.length+"</u>");
+		
+		//2. 產生回答狀況questionView的內容
+		for(var i=0; i<question.length; i++){
+			questionView = questionView +"_";
+		}
+		//測試ok 結果questionView =  ____  <<四個
+		
+		//實行置換使用者看得到的View
+		QusetionView(questionView);
+	}
+	
+//6.將questionView 弄出來 像是將____弄成 _ , _ , _ , _顯示在網頁上
+	function QusetionView(questionView){
+		
+		var OutPutString="";
+		for(var i=0;i<questionView.length; i++){
+			OutPutString = OutPutString + questionView.substr(i, 1);
+			OutPutString = OutPutString +"　";
+		}
+		
+		OutPutString = OutPutString.substr(0, OutPutString.length-1);
+		$("#QuestionView").html("<h1>"+OutPutString+"</h1>");
+	}	
+
+
+//7.玩家輸入顯示 (切換顯示字母 + Enter 輸入)
+	var tmp = null;
+
+	//鍵入監聽 
+	var browser=navigator.appName;
+	if(browser=="Netscape"){    
+		//如果瀏覽器為Netscape或者Firefox
+	    //開始監聽鍵盤事件
+	    document.captureEvents(Event.KEYDOWN)
+	    document.onkeydown=function(event){
+	        if(event.which>=65 && event.which <= 90 || event.which == 8 ||event.which == 46 ||event.which == 13){
+	
+	        	
+	        	if( !(event.which==13) ){
+		        	tmp = keydownCheck(event.which);
+		        	
+		        	$("#AnswerInput").html("<u>"+tmp+"</u>");
+	        	}
+	        	
+	        	//如果是Enter
+	        	if(event.which == 13){
+	        		AnswerCheck(tmp);
+	        		$("#AnswerInput").html("<u>　</u>");
+
+	        		//Enter > GameArea切換
+	        		if($("#GameArea").css("display")=="none"){
+	        			$("#GameArea").css("display",'inline');
+	        			$("#Enter").css("display",'none');
+	        		}
+	        	}
+	        	
+	    	}
+		}
+		
+	
+	}
+	
+//8. 給7參照用, 帶入數字回傳結果a~z
+	function keydownCheck(keyDown){
+		
+		switch(keyDown){
+			case 65 : return "A";
+			case 66 : return "B";
+			case 67 : return "C";
+			case 68 : return "D";
+			case 69 : return "E";
+			case 70 : return "F";
+			case 71 : return "G";
+			case 72 : return "H";
+			case 73 : return "I";
+			case 74 : return "J";
+			case 75 : return "K";
+			case 76 : return "L";
+			case 77 : return "M";
+			case 78 : return "N";
+			case 79 : return "O";
+			case 80 : return "P";
+			case 81 : return "Q";
+			case 82 : return "R";
+			case 83 : return "S";
+			case 84 : return "T";
+			case 85 : return "U";
+			case 86 : return "V";
+			case 87 : return "W";
+			case 88 : return "X";
+			case 89 : return "Y";
+			case 90 : return "Z";
+			
+			//Delect and Backspace Enter
+			case 46 : return "_";
+			case 8 : return "_";
+			
+		}
+	}
+	
+//9.Enter後續動作
+	//錯誤猜字集合陣列
+	AnswerArrayOfMistake = new Array(12);
+	for(var i=0; i<12; i++){
+		AnswerArrayOfMistake[i] = null;
+	}
+	
+	//正確猜字集合陣列
+	AnswerArrayOfCorrect = new Array(12);
+	for(var i=0; i<12; i++){
+		AnswerArrayOfCorrect[i] = null;
+	}
+	
+	function AnswerCheck(Answer){
+		var flag = true;
+		
+		// foreach陣列,重複則return (錯誤與正確陣列比對)
+		for(var i=0; i<12; i++){
+			if(AnswerArrayOfMistake[i] == Answer ||  AnswerArrayOfCorrect[i] == Answer){
+				flag = false;
+			}
+		}
+		
+		//此英文在陣列中出現過則return
+		if(flag == false){
+			return;	}
+		
+		
+		
+		//比對是否為正確答案
+		for(var i=0; i< question.length; i++){
+						
+			if(Answer.toLowerCase() == question.substr(i, 1).toLowerCase()){
+				
+				for(var i=0; i<12; i++){
+					if(AnswerArrayOfCorrect[i]==null){
+						AnswerArrayOfCorrect[i] = Answer;
+						//更新答案顯示
+						AnalysisAnswer();
+						//更新正確錯誤陣列
+						ArrayView();
+						//檢查是否獲勝
+						GameCheck();
+						return;
+					}
+				}
+				
+			}	
+		}
+	
+		
+		
+		
+		//錯誤用陣列
+			//	foreach陣列, null則覆蓋and Return
+		for(var i=0; i<13; i++){
+			if(AnswerArrayOfMistake[i]==null){
+				AnswerArrayOfMistake[i] = Answer;
+				//更新正確錯陣列
+				ArrayView();
+				CountOfDeath();
+				return;
+			}
+		}
+	}
+	
+//10.比對正確陣列做出新的QuestionView, Ex > J_v_ 後執行第五功能
+	function AnalysisAnswer(){
+		var newQuestionView ="";
+		
+		for(var j=0; j<question.length; j++){
+			
+			var flag = false;
+			
+			for(var i=0; i<12; i++){
+				
+				if(AnswerArrayOfCorrect[i] == null){
+					continue;
+				}
+				
+				if(question.substr(j, 1).toLowerCase() == AnswerArrayOfCorrect[i].toLowerCase()){
+					
+					newQuestionView = newQuestionView + AnswerArrayOfCorrect[i].toLowerCase();
+					flag = true;
+				}
+			}
+			
+			if(flag == false){
+				newQuestionView = newQuestionView + "_";
+			}
+		}
+		QusetionView(newQuestionView);
+	}
+
+//11.更新最新正確/錯誤陣列顯示
+	function ArrayView(){
+	
+	var newCorrectView = "";
+	var newMistakeView = "";
+	
+	
+	
+	for(var i=0; i<12; i++){
+		
+		if(AnswerArrayOfCorrect[i] == null){
+			continue;}
+		
+		newCorrectView = newCorrectView + AnswerArrayOfCorrect[i].toLowerCase();
+		newCorrectView = newCorrectView +" ";
+	}
+	
+	for(var i=0; i<12; i++){
+		
+		if(AnswerArrayOfMistake[i] == null){
+			continue;}
+		
+		newMistakeView = newMistakeView + AnswerArrayOfMistake[i].toLowerCase();
+		newMistakeView = newMistakeView + " ";
+	}
+	
+
+	$("#CorrectView").html(newCorrectView);
+	$("#MistakeView").html(newMistakeView);
+	
+}
+
+//12. 畫畫了....Orz
+var Count = 0;
+function CountOfDeath(){
+	Count++;
+	
+	switch(Count){
+		
+		case 1:
+			//1.一個圈
+			ctx.beginPath();
+			ctx.arc((grid/10)*3, (grid/10)*2, (grid/10)*1, 0 , Math.PI*2);
+			ctx.stroke();
+			ctx.save();
+			return;
+		
+		case 2:
+			//2.畫身體
+			ctx.fillRect((grid/10)*3, (grid/10)*3, (grid/1000)*3, (grid/10)*3); 
+			return;
+			
+		case 3:
+			//3.右手
+			ctx.rotate(Math.PI*-15/180);
+			ctx.translate((grid/10)*-1.2,(grid/10)*1);
+			ctx.fillRect((grid/10)*3, (grid/10)*4, (grid/10)*2, (grid/1000)*3);
+			ctx.restore();
+			ctx.save();
+			return;
+		
+		case 4:
+			//4.左手
+			ctx.rotate(Math.PI*15/180);
+			ctx.translate((grid/10)*1,(grid/10)*-0.6);
+			ctx.fillRect((grid/10)*3, (grid/10)*4, (grid/10)*-2, (grid/1000)*3);
+			ctx.restore();
+			ctx.save();
+			return;
+		
+		case 5:
+			//5.右腳
+			ctx.rotate(Math.PI*15/180);
+			ctx.translate((grid/10)*1.5,(grid/10)*-1);
+			ctx.fillRect((grid/10)*3, (grid/10)*6, (grid/10)*2, (grid/1000)*3);
+			ctx.restore();
+			ctx.save();
+			return;
+		
+		case 6:
+			//6.左腳
+			ctx.rotate(Math.PI* -15/180);
+			ctx.translate((grid/10)*-1.6,(grid/10)*0.5);
+			ctx.fillRect((grid/10)*3, (grid/10)*6, (grid/10)*-2, (grid/1000)*3);
+			ctx.restore();
+			ctx.save();
+			return;
+			
+		case 7:
+			//7.D
+			ctx.font = '45pt Arial';
+			ctx.fillText('D', (grid/10)*8, (grid/10)*1);
+			return;
+			
+		case 8:
+			//8.E
+			ctx.fillText('E', (grid/10)*8, (grid/10)*2.5);
+			return;
+			
+		case 9:
+			//9.A
+			ctx.fillText('A', (grid/10)*8, (grid/10)*4);
+			return;
+		
+		case 10:
+			//10.T
+			ctx.fillText('T', (grid/10)*8, (grid/10)*5.5);
+			return;
+		
+		case 11:
+			//11.H
+			ctx.fillText('H', (grid/10)*8, (grid/10)*7);
+			return;
+			
+		case 12:
+			//12.bye ^^/
+			ctx.font = '25pt Arial';
+			ctx.fillText('(^o^)ノシ', (grid/10)*7.5, (grid/10)*8);
+			return;
+		case 13:
+				$("#ggAnswer").html("問題は： "+question+"です       意味は："+answer+"です");
+				$("#GameArea").css("display",'none');
+				$("#GG").css("display",'inline');
+				$("#GameArea").css("display",'none');
+				$("#GameArea").html("　");
+			return;
+// 			$("#AnswerInput").html("<u>　</u>");
+	}
+}
+
+//13.確認勝利狀況
+function GameCheck(){
+	var chechFlag = true;
+	var ChechString = $("#QuestionView").html();
+	//沒有底線就是獲勝了
+	
+	
+	
+	for(var i=0; i< ChechString.length; i++){
+			
+		if(ChechString.substr(i, 1) == "_"){
+			
+			chechFlag = false;
+			
+		}
+	}
+	
+		if(chechFlag == true){
+			
+			$("#GameArea").css("display",'none');
+			$("#PassPage").css("display",'inline');
+			$("#GameArea").html("　");
+		}
+	
+	
+}
+
+//14.追加新的項目
+$("#NewQuestionAddButton").click(function(){
+	
+	var Wrong = $("#Wrong").val();
+    	Wrong++;
+
+    //	$("#NewQuestion").val()
+    //  $("#NewAnswer").val()
+	var Command = "insert,'"+$("#NewQuestion").val()+"','"+$("#NewAnswer").val()+"'";
+	
+	$.ajax({
+		"type":"post",
+		"url":"Hangman/QusetionServlet.do",
+		"data":{"action":"SelectCommand", 
+			    "Command":Command},
+		"dataType":"json",
+		"success":function(data){
+			$.each(data,function(){});
+		}
+	
+	});
+	
+	$("#PassPage").html("<h3>データーベース更新しました、ありがとうございました！</h3>");
+	
+});
+	
+
+
+
+</script>
+<script type="text/javascript">$( "#import" ).load("commomherf.html");</script>
+</body>
+</html>

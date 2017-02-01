@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+encoding//src/com/mistus/Question/controller/QuestionServlet.java=UTF-8
+encoding//src/com/mistus/Question/model/QuestionDAO_Hibernate.java=UTF-8
+encoding//src/com/mistus/Question/model/QuestionServices.java=UTF-8
+encoding//src/com/mistus/Question/model/QuestionVO.java=UTF-8
+encoding//src/com/mistus/Question/model/Question_TEST.java=UTF-8

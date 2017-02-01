@@ -1,0 +1,73 @@
+		
+				
+		*{padding:0px;}
+			
+			#TopDiv{
+					margin-top:10px;
+					margin-left:40%;
+				 }
+			
+			
+			
+			#AllDiv{width: 1880px;
+					height: 1000px;
+					border-style: solid;
+					margin:0px;
+					background-image: url("Image/A6.jpg");	
+					background-position:center;
+					
+					
+					/*opacity:0.5;*/
+					/*filter:alpha(opacity=60);*/
+					
+					
+					}
+		
+			
+			#ContentDiv{
+/*                 width:80%; */
+                        /*width:1300px;
+						height: 800px;
+						border-color:#FF0000;
+						border-style: solid;
+						float:left;
+						margin-left:90px;*/
+				}
+			#article{	width:1300px;
+						height: 650px;
+						border-color:#FF0000;
+						/*border-style: solid;*/
+						float:left;
+						margin-left:90px;
+						}
+		
+			
+			#RightDiv{	width:200px;
+						height: 650px;
+						border-color:#FF0000;
+						/*border-style: solid;*/
+						float:right;
+						
+						margin-right:60px;
+						}
+			
+			
+			#DownDiv{	width:1725px;
+						height: 150px;
+						border-color:black;
+						/*border-style: solid;*/
+						float:left;
+						margin-left: 90px;
+						margin-top: 20px;
+						
+						
+					/*	marquee-direction:forward;
+						marquee-play-count:20;
+						marquee-speed:normal;
+						marquee-style:alternate;  撟� 擉�� */
+				
+				
+				
+				/*<marquee direction="right" height="30" scrollamount="5" behavior="alternate">頝收��葫閰�</marquee>*/
+			}
+		

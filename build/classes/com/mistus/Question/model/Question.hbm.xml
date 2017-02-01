@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="com.mistus.Question.model.QuestionVO" table="question" lazy="false" >
+        <id name="questionNumber" column="questionNumber" >
+        
+            <generator class="identity"/>
+        </id>
+       
+        <property name="question" column="question" />
+        <property name="answer" column="answer" />
+        <property name="correct" column="correct" />
+        <property name="wrong" column="wrong" />
+
+    </class>
+</hibernate-mapping>
+

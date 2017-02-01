@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset ="UTF-8"/>
+<title>Hangman</title>
+<style>
+@import url('MyLabCss.css');
+canvas{	border: 1px solid black;
+		margin-left: 650px;}
+</style>
+<script src="js/jquery-1.11.2.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+</head>
+<body>
+<div id="AllDiv">
+	<div id="ContentDiv">
+		<div id = "import"></div>
+			<canvas id="canvas1" width="450" height="760">瀏覽器不支援畫布</canvas>
+		</div>
+</div>
+
+<!-- 控制方塊的js code -->
+<script type="text/javascript">
+	
+	var width = 450;
+	var height = 760;
+	var canvas = document.getElementById("canvas1");
+	var ctx = canvas.getContext("2d");
+	var array2d;
+	var continueFlag = true;
+	
+	
+	/*********************
+	*初始化區, 功能依序 畫格子，產生計算用二維陣列，遊戲主迴圈(900毫秒一次)，畫面更新迴圈(100毫秒一次)
+	*/
+		drop();
+	 	createArray(); 	
+	 	setInterval(gameStart, 900);
+	 	setInterval(view, 100　);
+		newOne();
+
+
+		
+	/*********************
+	*function gameStart 
+	*遊戲主迴圈  無線loop直到結束跳出
+	*/
+		function gameStart(){
+			
+			if(continueFlag == false){
+				return;}
+						
+		down();			
+		}
+		
+	
+		/*********************
+		*function drop 
+		*清除畫布重新顯示陣列內容
+		*/
+		function drop(){
+	
+				clear();		
+				createLine();
+				}
+		
+		
+		/*********************
+		*function createLine 
+		*畫格子 10 x 20
+		*單格高度：(height/20)   height在最上方初值設定區
+		*單格寬度：(width/10)    width在最上方初值設定區
+		*/
+		function createLine(){
+			
+			for(var i=1; i<=10; i++){			
+				ctx.fillRect((width/10)*i,0,1,height);}		
+			for(var i=1; i<=20; i++){			
+				ctx.fillRect(0,(height/20)*i,width,1);}
+		}
+		
+		
+		/*********************
+		*function clear 
+		*將畫布全部清空，方便重新畫格子
+		*heigth:畫布高度   height在最上方初值設定區
+		*width :畫布寬度    width在最上方初值設定區
+		*/
+		function clear(){
+
+			ctx.clearRect(0, 0, width, height);
+		}
+		
+		/*********************
+		*function createArray 
+		*製作10x20陣列array2d[x][y]
+		*是主要計算遊戲變化的二維陣列 
+		*正方形 最左上是(0,0)持續延伸,   
+		*高度:Y[0-19]是遊戲區域, 而Y[20]是底層,內容值設為1
+		*/
+		function createArray(){
+			
+			var x = 10;
+			var y = 20;
+			array2d = new Array(x);
+			for (i = 0 ; i < y ; i++) {
+			  array2d[i] = new Array(y);}
+			
+			//初始化全部設0
+			for(var j=19; j>=0; j--){
+				
+				for(var i=9; i>=0; i--){
+					
+					array2d[i][j]=0;}}
+			
+			//建造底部 y=20 -> 1
+			for(var i=0; i<10; i++){
+				array2d[i][20]=1;}	
+		}
+		
+		
+		/******************
+		*function view
+		*清除畫布後重新畫線，接著載入二維陣列內容
+		*/
+		function view(){
+			
+			//Clear and CrateLine
+			drop();
+			//載入陣列內容
+			for(var i=0; i<10; i++){
+				
+				for(var j=0; j<20; j++){
+					
+					if(array2d[i][j] == 1 || array2d[i][j] == 2){
+						
+						ctx.fillRect((width/10)*i, (height/20)*j, (width/10), (height/20));}}}
+		}
+		
+		
+		/******************
+		*function statusChangeA_To_B
+		*將全部的格子掃過一次，一個一個掃，如果掃到A, 就將A變成B
+		*/
+		function statusChangeA_To_B(a , b){
+			
+			for(var j=19; j>=0; j--){
+				
+				for(var i=9; i>=0; i--){
+					
+					if(array2d[i][j] == a)
+					{
+						array2d[i][j]=b;}}}
+		}
+			
+			
+			
+			
+		
+		
+		//掉落, 碰到東西就rollback
+		/******************
+		*function down
+		*主要的掉落功能，先產生一個新的二維陣列存放目前的計算結果，接著試著讓方塊掉落，一個一個掃，掃下一格是否為0，
+		*是的話讓其掉落，失敗的話rollback並將其值轉變成1固定，判斷有無消除，計算更新後產生新的方塊
+		*/
+		function down(){
+			
+			var copyArray = new Array(10);
+			
+			for (i = 0 ; i < 20 ; i++) {
+ 				copyArray[i] = array2d[i].slice(0,21);}
+	
+			
+			for(var j=20; j>=0; j--){
+				
+				for(var i=10; i>=0; i--){
+					
+					if(array2d[i][j] == 2 && array2d[i][j+1] != 1){
+										
+						array2d[i][j+1] = array2d[i][j];
+						array2d[i][j]=0;}
+					else if(array2d[i][j] == 2 && array2d[i][j+1] == 1){
+						
+						array2d = copyArray;
+						statusChangeA_To_B(2, 1);
+						
+						removeCheck();
+						newOne();
+						return;}}}
+		}
+		
+
+		/******************
+		*function newOne
+		*產生新的方塊，如果要加新的方塊，記得旋轉要去加那個方塊的偵測跟旋轉方式
+		*玩家正在控制的方塊其值為2
+		*/
+		function newOne(){
+			var maxNum = 10;  
+			var minNum = 0;  
+			var newOne = Math.floor(Math.random() * (2 - 1 + 1)) + 1;  
+			
+			if(newOne==1){
+				
+				array2d[4][1]=2;
+				array2d[5][1]=2;
+				array2d[6][1]=2;
+				array2d[7][1]=2;
+			}else if(newOne==2){
+				
+				array2d[6][0]=2;
+				array2d[5][1]=2;
+				array2d[6][1]=2;
+				array2d[7][1]=2;
+			}
+		}
+		
+		/******************
+		*function removeCheck
+		*1.判斷是否有消除
+		*2.消除方塊
+		*3.上方方塊掉落
+		*/
+		function removeCheck(){
+			
+			var removeArray = new Array(4);
+			removeArray[0]=null;
+			removeArray[1]=null;
+			removeArray[2]=null;
+			removeArray[3]=null;
+			var count = 0;
+			
+			for(var j=19; j>=0; j--){
+
+				
+				if(array2d[0][j]==1 
+				 &&array2d[1][j]==1
+				 &&array2d[2][j]==1
+				 &&array2d[3][j]==1
+				 &&array2d[4][j]==1
+				 &&array2d[5][j]==1
+				 &&array2d[6][j]==1
+				 &&array2d[7][j]==1
+				 &&array2d[8][j]==1
+				 &&array2d[9][j]==1)
+				{
+					removeArray[count] = j;
+					count++;
+				}
+			}
+			
+			//消除方塊，將其值變為0
+			if(removeArray[0]!=null){
+				arrayToChange(removeArray[0], 0);
+			if(removeArray[1]!=null){
+				arrayToChange(removeArray[1], 0);}
+			if(removeArray[2]!=null){
+				arrayToChange(removeArray[2], 0);}
+			if(removeArray[3]!=null){
+				arrayToChange(removeArray[3], 0);}
+				
+		continueFlag = false ;
+
+		//消除後落下的計算
+		for(var i=0; i<4; i++){
+			
+			if(removeArray[i]!=null){
+				
+				
+				for(var j=((removeArray[i]-1)+i); j>0; j--){
+				
+						
+						
+					for(var k=0; k<10; k++){
+						
+						if(array2d[k][j]==1){
+							
+							array2d[k][j+1]=1; 
+							array2d[k][j]=0; 
+							
+						}}}}
+			continueFlag = true ;}}
+			
+		}
+
+		/****************
+		*function arrayToChange
+		*指定列換成指定內容
+		*row:指定列
+		*changeTo:指定內容
+		*/
+		function arrayToChange(row, changeTo){
+			
+			array2d[0][row] = changeTo ;
+			array2d[1][row] = changeTo ;
+			array2d[2][row] = changeTo ;
+			array2d[3][row] = changeTo ;
+			array2d[4][row] = changeTo ;
+			array2d[5][row] = changeTo ;
+			array2d[6][row] = changeTo ;
+			array2d[7][row] = changeTo ;
+			array2d[8][row] = changeTo ;
+			array2d[9][row] = changeTo ;
+					
+		}
+		
+		/*********************
+		*function rightMove
+		*右移方塊
+		*同掉落，  撞牆就Rollback
+		*/
+		function rightMove(){
+			
+			var copyArray = new Array(10);
+			
+			for (i = 0 ; i < 20 ; i++) {
+ 				copyArray[i] = array2d[i].slice(0,21);}
+					
+
+			for(var j=20; j>=0; j--){
+				
+				for(var i=10; i>=0; i--){
+					
+					
+					if(array2d[i][j] == 2 && (i+1)>=10){
+						array2d = copyArray;
+						return;
+					}
+					
+					else if(array2d[i][j] == 2 && array2d[i+1][j] != 1){
+										
+						array2d[i+1][j] = array2d[i][j];
+						array2d[i][j]=0;
+						}
+					else if(array2d[i][j] == 2 && array2d[i+1][j] == 1){
+						
+						array2d = copyArray;
+						return;}}}
+
+		}
+		
+		
+		/*********************
+		*function leftMove
+		*左移方塊
+		*同掉落，  撞牆就Rollback
+		*/
+		function leftMove(){
+
+			var copyArray = new Array(10);
+			
+			for (i = 0 ; i < 20 ; i++) {
+ 				copyArray[i] = array2d[i].slice(0,21);}
+			
+			for(var j=20; j>=0; j--){
+				
+				for(var i=0; i<10; i++){
+					
+					if(array2d[i][j] == 2 && i -1 < 0){
+						array2d = copyArray;
+						return;}
+					else if(array2d[i][j] == 2 && array2d[i+(-1)][j] != 1){
+										
+						array2d[i+(-1)][j] = array2d[i][j];
+						array2d[i][j]=0;}
+					
+					else if(array2d[i][j] == 2 && array2d[i+(-1)][j] == 1){
+						
+						array2d = copyArray;
+						return;}}}
+			}
+		
+		/*********************
+		*這不是function 改天把它弄到前面去
+		*偵測keydown 判斷瀏覽器的code被我刪掉了www
+		*37是右移, 39是左移,  
+		*38是旋轉
+		*40強制執行一次掉落功能
+		*/
+		
+		//偵測keydown 判斷瀏覽器的code被我刪掉了www
+		
+		var browser=navigator.appName;
+		if(browser=="Netscape"){    
+			//如果瀏覽器為Netscape或者Firefox
+		    //開始監聽鍵盤事件
+		    document.captureEvents(Event.KEYDOWN)
+		    document.onkeydown=function(event){
+		        if(event.which==37){
+		            //key code 37為→
+		        	leftMove();
+		        }
+		        else if(event.which==39){
+		            //key code 39為←
+		        	rightMove();
+		        }
+		        else if(event.which==38){
+		        	Rotation();
+		        }
+		        else if(event.which==40){
+		        	down();
+		        }
+		    }
+		}
+		
+		//旋轉
+		/***************
+		*function Rotation
+		*旋轉功能
+		*先使用shapeCheck得到偵測結果，之後依方外不同變換資料位移方式
+		*/
+		function Rotation(){
+			
+			var checkShape = shapeCheck();
+			
+			for(var j=20; j>=0; j--){
+				
+				for(var i=10; i>=0; i--){
+			
+					if(array2d[i][j]==2){
+									
+			//判斷形狀
+			switch (checkShape) {
+				
+				case "_|_":
+					// 向左 > 向上 <<
+					if((array2d[i][j]==2 && array2d[i][j-1]==2 && array2d[i][j-2]==2 && array2d[i-1][j-1] ==2)
+						&&array2d[i+1][j-1]==0){
+						
+						array2d[i+1][j-1] = array2d[i][j] ;
+						array2d[i][j] = 0;
+						return;
+					}//向上 > 向右
+					else if((array2d[i][j]==2 && array2d[i-1][j]==2 && array2d[i-2][j]==2 && array2d[i-1][j-1] ==2)
+							&&array2d[i-1][j+1]==0){
+						
+						array2d[i-1][j+1] = array2d[i-2][j] ;
+						array2d[i-2][j] = 0;
+						return;
+					}//向右 > 向下
+					else if((array2d[i][j]==2 && array2d[i][j-1]==2 && array2d[i][j-2]==2 && array2d[i+1][j-1] ==2)
+							&&array2d[i-1][j-1]==0){
+						
+						array2d[i-1][j-1] = array2d[i][j-2];
+						array2d[i][j-2] = 0;
+						return;
+					}//向下>向左
+					else if((array2d[i][j]==2 && array2d[i][j-1]==2 && array2d[i+1][j-1]==2 && array2d[i-1][j-1] ==2)
+							&& array2d[i][j-2]==0){
+						
+						array2d[i][j-2] = array2d[i+1][j-1];
+						array2d[i+1][j-1] = 0;
+						return;
+						
+					}
+									
+					break;
+					
+				case "|":
+								
+					if((array2d[i][j]==2 && array2d[i][j-1]==2 && array2d[i][j-2]==2 && array2d[i][j-3] ==2)	
+					 &&(array2d[i-1][j]==0 && array2d[i-2][j]==0 && array2d[i-3][j]==0)){
+						
+						array2d[i-1][j] = array2d[i][j-1];
+						array2d[i-2][j] = array2d[i][j-2];
+						array2d[i-3][j] = array2d[i][j-3];
+						
+						array2d[i][j-1] = 0;
+						array2d[i][j-2] = 0;
+						array2d[i][j-3] = 0;
+
+						return;}
+					
+					
+					if((array2d[i][j]==2 && array2d[i-1][j]==2 && array2d[i-2][j]==2 && array2d[i-3][j]==2)
+					 &&(array2d[i][j-1]==0 && array2d[i][j-2]==0 && array2d[i][j-3] ==0)){
+						
+						array2d[i][j-1] = array2d[i-1][j];
+						array2d[i][j-2] = array2d[i-2][j];
+						array2d[i][j-3] = array2d[i-3][j];
+						
+						array2d[i-1][j] = 0;
+						array2d[i-2][j] = 0;
+						array2d[i-3][j] = 0;
+
+						return;}
+					
+					break;}}}}
+		}
+		
+		
+		/********************************
+		*function shapeCheck
+		*偵測方塊的型狀 
+		*return "_|_" or "|" 嘛 趣味....
+		*/
+		function shapeCheck(){
+			
+			for(var j=20; j>=0; j--){
+				
+				for(var i=10; i>=0; i--){
+					//一次掃十個一組，右下角開始掃到上面
+					
+					// _|_<<  依序 向左 向下 向右 向上
+					if((array2d[i][j]==2 && array2d[i][j-1]==2 && array2d[i][j-2]==2 && array2d[i-1][j-1] ==2)
+					 ||(array2d[i][j]==2 && array2d[i][j-1]==2 && array2d[i+1][j-1]==2 && array2d[i-1][j-1] ==2)
+					 ||(array2d[i][j]==2 && array2d[i][j-1]==2 && array2d[i][j-2]==2 && array2d[i+1][j-1] ==2)
+					 ||(array2d[i][j]==2 && array2d[i-1][j]==2 && array2d[i-2][j]==2 && array2d[i-1][j-1] ==2))
+					{return "_|_";}
+					
+					// |<<
+					if((array2d[i][j]==2 && array2d[i][j+1]==2 && array2d[i][j+2]==2 && array2d[i][j+3] ==2)
+					 ||(array2d[i][j]==2 && array2d[i-1][j]==2 && array2d[i-2][j]==2 && array2d[i-3][j] ==2))
+					{return "|";}}}
+			
+			//都沒有
+			return "not Fount"; 
+		}
+		
+		/********************************
+		*function sleep
+		*參考來的sleep程式, 引數是毫秒
+		*寫的人蠻厲害的
+		*/
+		function sleep(milliseconds) {
+  			var start = new Date().getTime();
+  				for (var i = 0; i < 1e7; i++) {
+				    if ((new Date().getTime() - start) > milliseconds){
+				      break;}}
+		}
+
+	</script>
+<!-- 插入菜單Html標籤 -->
+<script type="text/javascript">$( "#import" ).load("commomherf.html");</script>
+</body>
+</html>
