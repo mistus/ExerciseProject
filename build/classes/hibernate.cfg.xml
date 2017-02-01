@@ -10,7 +10,7 @@
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
 		<property name="hibernate.connection.url">jdbc:mysql://localhost:3306/database2</property>
 		<property name="hibernate.connection.username">root</property>
-		<property name="hibernate.connection.password">790726</property>
+		<property name="hibernate.connection.password">A123456</property>
       
 <!--       test 超時連接對策 -->
         <property name="connection.autoReconnect">true</property>  
